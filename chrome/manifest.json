@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "Zillow",
+    "version": "1.0.0",
+    "description": "Zillow",
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.zillow.com/*"
+            ],
+            "js": [
+                "src/js/script.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "storage",
+        "alarms",
+        "tabs",
+        "scripting",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "https://www.zillow.com/*"
+    ]
+}
