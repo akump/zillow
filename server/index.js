@@ -1,16 +1,18 @@
 import express from "express";
 import { MongoClient } from "mongodb";
+import cors from "cors";
 
 const app = express();
+app.use(cors())
+app.use(express.json())
 const port = 3000;
 
 const url = "mongodb+srv://user:pass@cluster0.bkukpgk.mongodb.net/test";
 const client = new MongoClient(url);
 
 await client.connect();
-console.log("Connected successfully to server");
 const db = client.db("Zillow");
-const collection = db.collection("ZillowUpvotes");
+const collection = db.collection("comments");
 
 function replaceZpid(zpid) {
     if (zpid.endsWith('_zpid')) {
@@ -20,42 +22,26 @@ function replaceZpid(zpid) {
 }
 
 app.get("/:zpid", async (req, res) => {
-    let zpid = replaceZpid(req.params.zpid);
-    const doc = await collection.findOne({ zpid })
-    res.send(doc || {});
+    let replacedZpid = replaceZpid(req.params.zpid);
+    const doc = await collection.findOne({ zpid: replacedZpid })
+    res.send(doc || { comments: [] });
 });
 
-app.post("/:zpid", async (req, res) => {
+app.post("/:zpid/comment", async (req, res) => {
     let zpid = replaceZpid(req.params.zpid);
-    await collection.insertOne({ zpid, tvTooHigh: 0 })
-    res.send(200);
-});
-
-app.put("/:zpid/increment", async (req, res) => {
-    let zpid = replaceZpid(req.params.zpid);
+    if (!req.body.comment) res.sendStatus(400);
     const doc = await collection.findOne({ zpid })
     if (!doc) {
-        await collection.insertOne({ zpid, tvTooHigh: 1 })
+        await collection.insertOne({ zpid, comments: [req.body.comment.substring(0, 160)] })
     } else {
-        await collection.updateOne({ zpid }, { $inc: { tvTooHigh: 1 } });
+        collection.updateOne(
+            { zpid },
+            { $push: { comments: req.body.comment.substring(0, 160) } }
+        )
     }
-    const createdDoc = await collection.findOne({ zpid })
-    res.send(createdDoc);
+    res.sendStatus(200);
 });
 
-app.put("/:zpid/decerement", async (req, res) => {
-    let zpid = replaceZpid(req.params.zpid);
-    const doc = await collection.findOne({ zpid })
-    if (!doc) {
-        await collection.insertOne({ zpid, tvTooHigh: 1 })
-    } else {
-        if (doc.tvTooHigh > 0) {
-            await collection.updateOne({ zpid }, { $inc: { tvTooHigh: -1 } });
-        }
-    }
-    const createdDoc = await collection.findOne({ zpid })
-    res.send(createdDoc);
-});
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Listening on port: ${port}`);
 });

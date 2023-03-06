@@ -10,6 +10,9 @@
             ],
             "js": [
                 "src/js/script.js"
+            ],
+            "css": [
+                "src/css/main.css"
             ]
         }
     ],
@@ -21,6 +24,7 @@
         "webRequest"
     ],
     "host_permissions": [
-        "https://www.zillow.com/*"
+        "https://www.zillow.com/*",
+        "http://localhost/*"
     ]
 }

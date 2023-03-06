@@ -1,0 +1,24 @@
+#zillowCommentsContainer {
+    z-index: 9999999999;
+    height: 400px;
+    max-height: 400px;
+    display: flex;
+    position: absolute;
+    width: 400px;
+    background: white;
+    flex-direction: column;
+    bottom: 0;
+    padding: 5px;
+}
+
+#zillowComments {
+    flex: 1;
+}
+
+#zillowMessageContainer {
+    display: flex;
+}
+
+#submitButton {
+    margin-left: 10px;
+}
